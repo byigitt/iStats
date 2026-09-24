@@ -25,8 +25,7 @@ final class Monitor {
 
     private init() {
         Prefs.registerDefaults()
-        let initial = ProcessInfo.processInfo.environment["ISTATS_TAB"].flatMap(Tab.init(rawValue:))
-        tab = initial ?? .overview
+        tab = .overview
         let cores = engine.cpuCores
         self.cores = cores.total
         performanceCores = cores.performance

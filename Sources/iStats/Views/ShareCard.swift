@@ -54,6 +54,7 @@ struct ShareCard: View {
             Text(Date.now.formatted(date: .abbreviated, time: .shortened))
                 .font(.system(size: 10.5))
                 .foregroundStyle(muted)
+                .padding(.top, 10)
         }
         .foregroundStyle(ink)
         .padding(26)
@@ -206,6 +207,23 @@ struct ShareCard: View {
     }
 }
 
+extension ShareCard {
+    /// ImageRenderer produces 16-bit extended-range pixels; redrawn into 8-bit sRGB the PNG is a fraction of the size.
+    @MainActor
+    func png() -> Data? {
+        let renderer = ImageRenderer(content: self)
+        renderer.scale = 2
+        guard let image = renderer.cgImage,
+              let space = CGColorSpace(name: CGColorSpace.sRGB),
+              let context = CGContext(data: nil, width: image.width, height: image.height, bitsPerComponent: 8, bytesPerRow: 0,
+                                      space: space, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)
+        else { return nil }
+        context.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
+        guard let flattened = context.makeImage() else { return nil }
+        return NSBitmapImageRep(cgImage: flattened).representation(using: .png, properties: [:])
+    }
+}
+
 /// Sheet for picking a card, previewing it and saving or copying the PNG.
 struct ExportSheet: View {
     @Environment(Monitor.self) private var monitor
@@ -255,17 +273,7 @@ struct ExportSheet: View {
         ShareCard(kind: kind, dark: dark, snapshot: monitor.snapshot, memoryTotal: monitor.memoryTotal, cores: monitor.cores)
     }
 
-    @MainActor
-    private func render() -> NSImage? {
-        let renderer = ImageRenderer(content: card)
-        renderer.scale = 2
-        return renderer.nsImage
-    }
-
-    private func png() -> Data? {
-        guard let image = render(), let tiff = image.tiffRepresentation, let bitmap = NSBitmapImageRep(data: tiff) else { return nil }
-        return bitmap.representation(using: .png, properties: [:])
-    }
+    private func png() -> Data? { card.png() }
 
     private func copy() {
         guard let data = png() else { return }

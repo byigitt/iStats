@@ -51,6 +51,10 @@ private struct GraphLabel: View {
                 let slots = 10
                 let slot = size.width / CGFloat(slots)
                 let offset = slots - values.count
+                for index in 0..<slots {
+                    let track = CGRect(x: CGFloat(index) * slot + 0.5, y: 0, width: slot - 1, height: size.height)
+                    context.fill(Path(roundedRect: track, cornerRadius: 0.8), with: .color(.black.opacity(0.25)))
+                }
                 for (index, value) in values.enumerated() {
                     let height = max(1.5, CGFloat(min(Double(value) / 100, 1)) * size.height)
                     let rect = CGRect(x: CGFloat(index + offset) * slot + 0.5, y: size.height - height, width: slot - 1, height: height)
