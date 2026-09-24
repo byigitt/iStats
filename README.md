@@ -19,6 +19,16 @@ The app is built to stay small. With the window open it uses about 40–50 MB. I
 - macOS 14 or later (Liquid Glass needs macOS 26)
 - Xcode 16 or later / Swift 5.10 or later
 
+## Install
+
+Download `iStats-0.0.1.zip` from the [latest release](https://github.com/byigitt/iStats/releases/latest), unzip it and move `iStats.app` to `/Applications`.
+
+The app is signed ad hoc, so macOS quarantines it on first launch. Clear the flag once:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/iStats.app
+```
+
 ## Build
 
 ```bash
